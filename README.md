@@ -3,9 +3,9 @@
 
 ## Examples Available
 
-* [TODO] Connect to server 
-* [TODO] List all channels
-* [TODO] List all members
+* Lonnect to server 
+* List all channels
+* List all members
 * [TODO] Fetch all messages from a channel
 * [TODO] Reply to a DM
 * [TODO] Reply to a message

@@ -10,7 +10,7 @@ client.on('ready', () => {
     printChannels(guild);
     printMembers(guild);
 
-    getMessages(guild.channels.cache.get('724442665093038110'));
+    getMessages(guild.channels.cache.get('725524078282145806'));
 });
 
 function getGuild(client) {
@@ -47,16 +47,25 @@ function getMessages(channel, beforeMessageId = null) {
     .then(messages => {
         var cursorMessageId = null;
         for (var message of messages) {
-            console.log(message); 
-            messagesArray.push(message[1].content);
+            // console.log(message)
+            var item = {
+                id: message[1].id,
+                channel: message[1].channel.id,
+                author: message[1].author.id,
+                content: message[1].content,
+                created: message[1].createdTimestamp,
+                modified: message[1].editedTimestamp,
+                deleted: message[1].deleted,
+            }
+            messagesArray.push(item);
             cursorMessageId = message[1].id;
         }
-        console.log(messages.size);
+        console.log(messages.size + " messages fetched");
         if (messages.size > 0 && cursorMessageId != beforeMessageId) {
-            console.log("next page - " + cursorMessageId);
+            console.log("next page with cursor: " + cursorMessageId);
             setTimeout(() => {getMessages(channel, cursorMessageId)}, 1000);
         } else {
-            console.log(JSON.stringify(messagesArray)); 
+            console.log(messagesArray); 
         }
     })
     .catch(console.error);

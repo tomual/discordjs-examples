@@ -7,11 +7,26 @@ client.login(auth.token);
 client.on('ready', () => {
     var guild = getGuild(client);
     printGuild(guild);
+    console.log(guild);
+    printEmojis(guild);
     printChannels(guild);
     printMembers(guild);
 
-    getMessages(guild.channels.cache.get('725524078282145806'));
+    // getMessages(guild.channels.cache.get('725524078282145806'));
 });
+
+client.on('message', message => {
+    console.log(message.content);
+    message.content = message.content.toLowerCase();
+
+    postReaction(message);
+});
+
+function postReaction(message) {
+    if (message.content.includes('react') ) {
+        message.react('726121176803311718');
+    }
+}
 
 function getGuild(client) {
     var guildId = client.guilds.cache.keys().next().value;
@@ -23,6 +38,14 @@ function printGuild(guild)
 {
     console.log("\n\nGUILD ----------------------------------------------------");
     console.log(guild.id + "\t" + guild.name);
+}
+
+function printEmojis(guild)
+{
+    console.log("\n\nEMOJIS -------------------------------------------------");
+    for (var emoji of guild.emojis.cache) {
+        console.log(emoji[1].id + "\t" + emoji[1].name);
+    }
 }
 
 function printChannels(guild)

@@ -1,16 +1,18 @@
 const Discord = require('discord.js');
 const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION'] });
 const auth = require('./auth.json');
+var guild;
 
 client.login(auth.token);
 
 client.on('ready', () => {
-    var guild = getGuild(client);
+    guild = getGuild(client);
 
-    printGuild(guild);
-    printEmojis(guild);
-    printChannels(guild);
-    printMembers(guild);
+    // printGuild(guild);
+    // printEmojis(guild);
+    // printChannels(guild);
+    // printRoles(guild);
+    // printMembers(guild);
 
     // getMessages(guild.channels.cache.get('725524078282145806'));
 });
@@ -34,6 +36,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
     if (reaction._emoji.name == "💯") {
         console.log(user.username + " reacted to Message ID:" + reaction.message.id + " with 💯!");
     }
+});
+
+client.on('guildMemberAdd', member => {
+    console.log(member.user.username + " has joined.");
+    setRole('724403792723968021', member);
 });
 
 function postReaction(message) {
@@ -70,11 +77,27 @@ function printChannels(guild)
     }
 }
 
+function printRoles(guild)
+{
+    console.log("\n\nROLES --------------------------------------------------");
+    for (var role of guild.roles.cache) {
+        console.log(role[1].id + "\t" + role[1].name);
+    }
+}
+
 function printMembers(guild)
 {
     console.log("\n\nMEMBERS --------------------------------------------------");
     for (var member of guild.members.cache) {
         console.log(member[1].user.id + "\t" + member[1].user.username + "#" + member[1].user.discriminator);
+    }
+}
+
+function setRole(roleId, member)
+{
+    var role = guild.roles.cache.get(roleId);
+    if (role) {
+        member.roles.add(role);
     }
 }
 

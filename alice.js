@@ -3,20 +3,25 @@ const client = new Discord.Client({ partials: ['MESSAGE', 'CHANNEL', 'REACTION']
 const auth = require('./auth.json');
 var guild;
 
+// Connect to server
 client.login(auth.token);
 
+// When bot is connected
 client.on('ready', () => {
     guild = getGuild(client);
 
     // printGuild(guild);
     // printEmojis(guild);
-    // printChannels(guild);
+    printChannels(guild);
     // printRoles(guild);
     // printMembers(guild);
 
     // getMessages(guild.channels.cache.get('725524078282145806'));
+    // sendMessage(guild.channels.cache.get('725259488608649277'), 'Hello!');
 });
 
+
+// When someone sends a message
 client.on('message', message => {
     console.log(message.content);
     message.content = message.content.toLowerCase();
@@ -24,6 +29,7 @@ client.on('message', message => {
     postReaction(message);
 });
 
+// When there is a reaction
 client.on('messageReactionAdd', async (reaction, user) => {
     if (reaction.partial) {
         try {
@@ -38,17 +44,21 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 });
 
+// When a new member joins
 client.on('guildMemberAdd', member => {
     console.log(member.user.username + " has joined.");
-    setRole('724403792723968021', member);
+    var role = guild.roles.cache.get(roleId);
+    setRole(member, role);
 });
 
+// Post a reaction
 function postReaction(message) {
     if (message.content.includes('react') ) {
         message.react('726121176803311718');
     }
 }
 
+// Get guild from connection
 function getGuild(client) {
     var guildId = client.guilds.cache.keys().next().value;
     var guild = client.guilds.cache.get(guildId);
@@ -93,14 +103,19 @@ function printMembers(guild)
     }
 }
 
-function setRole(roleId, member)
+// Add role to member
+function setRole(member, role)
 {
-    var role = guild.roles.cache.get(roleId);
-    if (role) {
-        member.roles.add(role);
-    }
+    member.roles.add(role);
 }
 
+// Send a message to a channel
+function sendMessage(channel, message)
+{
+    channel.send(message);
+}
+
+// Get all messages in a channel
 var messagesArray = [];
 function getMessages(channel, beforeMessageId = null) {
     channel.messages.fetch({ limit: 100, before: beforeMessageId })
@@ -110,21 +125,24 @@ function getMessages(channel, beforeMessageId = null) {
             // console.log(message)
             var item = {
                 id: message[1].id,
-                channel: message[1].channel.id,
+                // channel: message[1].channel.id,
                 author: message[1].author.id,
                 content: message[1].content,
-                created: message[1].createdTimestamp,
-                modified: message[1].editedTimestamp,
-                deleted: message[1].deleted,
+                // created: message[1].createdTimestamp,
+                // modified: message[1].editedTimestamp,
+                // deleted: message[1].deleted,
             }
             messagesArray.push(item);
             cursorMessageId = message[1].id;
         }
+        // We only get 100 messages at a time - check if we need to go to the next page
         console.log(messages.size + " messages fetched");
         if (messages.size > 0 && cursorMessageId != beforeMessageId) {
             console.log("next page with cursor: " + cursorMessageId);
+            // Next page!
             setTimeout(() => {getMessages(channel, cursorMessageId)}, 1000);
         } else {
+            // We're done, print out the JSON of messages
             console.log(messagesArray); 
         }
     })

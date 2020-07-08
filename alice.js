@@ -10,14 +10,13 @@ client.login(auth.token);
 client.on('ready', () => {
     guild = getGuild(client);
 
-    // printGuild(guild);
-    // printEmojis(guild);
+    printGuild(guild);
+    printEmojis(guild);
     printChannels(guild);
-    // printRoles(guild);
-    // printMembers(guild);
+    printRoles(guild);
+    printMembers(guild);
 
-    // getMessages(guild.channels.cache.get('725524078282145806'));
-    // sendMessage(guild.channels.cache.get('725259488608649277'), 'Hello!');
+    getMessages(guild.channels.cache.find(channel => channel.name === 'mods'));
 });
 
 
@@ -26,7 +25,45 @@ client.on('message', message => {
     console.log(message.content);
     message.content = message.content.toLowerCase();
 
-    postReaction(message);
+    // Do something with what comes after a command
+    if (message.content.startsWith("!say") ) {
+        // Get the phrase after the command
+        var input = message.content.replace(/\!say /, "");
+        message.channel.send(input);
+    }
+
+    // Do something with a mentioned user after a command
+    if (message.content.startsWith("!enlighten") ) {
+        // Check the author's roles to make sure they have the Admin role (optional)
+        if (message.member.roles.cache.find(role => role.name === "Admin")) {
+            if (message.mentions.users.size) {
+                // Add a role to this user
+                var role = guild.roles.cache.find(role => role.name === 'enlightened');
+                if (role) {
+                    var member = guild.members.cache.get(message.mentions.users.first().id);
+                    member.roles.add(role);
+                }
+            }
+        }
+    }
+
+    // Respond to a message that contains a phrase
+    if (message.content.includes("i'm hungry") ) {
+        message.channel.send("Enjoy a toasted sandwich!");
+    }
+
+    // React to a message
+    if (message.content.startsWith('!react') ) {
+        // React with a custom emoji
+        var emoji = client.emojis.cache.find(emoji => emoji.name === 'EMOJI_NAME_HERE');
+        if (emoji) {
+            message.react(emoji);
+        } else {
+            console.log('Could not find custom emoji');
+        }
+        // React with standard emoji
+        message.react('💯');
+    }
 });
 
 // When there is a reaction
@@ -48,15 +85,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
 client.on('guildMemberAdd', member => {
     console.log(member.user.username + " has joined.");
     var role = guild.roles.cache.get(roleId);
-    setRole(member, role);
+    member.roles.add(role);
 });
-
-// Post a reaction
-function postReaction(message) {
-    if (message.content.includes('react') ) {
-        message.react('726121176803311718');
-    }
-}
 
 // Get guild from connection
 function getGuild(client) {
@@ -103,19 +133,7 @@ function printMembers(guild)
     }
 }
 
-// Add role to member
-function setRole(member, role)
-{
-    member.roles.add(role);
-}
-
-// Send a message to a channel
-function sendMessage(channel, message)
-{
-    channel.send(message);
-}
-
-// Get all messages in a channel
+// Get all messages in a given channel
 var messagesArray = [];
 function getMessages(channel, beforeMessageId = null) {
     channel.messages.fetch({ limit: 100, before: beforeMessageId })

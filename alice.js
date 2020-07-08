@@ -16,9 +16,9 @@ client.on('ready', () => {
     printRoles(guild);
     printMembers(guild);
 
+    // Print out all messages from a channel using the channel name
     getMessages(guild.channels.cache.find(channel => channel.name === 'mods'));
 });
-
 
 // When someone sends a message
 client.on('message', message => {
